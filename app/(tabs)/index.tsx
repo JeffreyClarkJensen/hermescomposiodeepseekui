@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@clerk/clerk-expo';
 import { colors, radius, font, spacing } from '../../lib/theme';
 import { useStore } from '../../lib/store';
 import { sendMessageStream, type ChatMessage } from '../../lib/hermes';
@@ -12,6 +13,7 @@ import type { Message } from '../../lib/supabase';
 
 export default function ChatScreen() {
   const insets = useSafeAreaInsets();
+  const { getToken } = useAuth();
   const { messages, isThinking, addMessage, setThinking, setLogsOpen, addLog, appendToLastMessage, setStreamingId } = useStore();
   const [input, setInput] = useState('');
   const listRef = useRef<FlatList>(null);
@@ -30,11 +32,12 @@ export default function ChatScreen() {
     setStreamingId(assistantId);
 
     const history: ChatMessage[] = [...messages, userMsg].map(m => ({ role: m.role, content: m.content }));
+    const token = await getToken();
 
     sendMessageStream(
       history,
-      (token) => {
-        appendToLastMessage(token);
+      (chunk) => {
+        appendToLastMessage(chunk);
         setTimeout(() => listRef.current?.scrollToEnd({ animated: false }), 0);
       },
       () => {
@@ -48,6 +51,7 @@ export default function ChatScreen() {
         setThinking(false);
         setStreamingId(null);
       },
+      token ?? undefined,
     );
   }, [input, isThinking, messages]);
 

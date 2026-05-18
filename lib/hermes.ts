@@ -7,12 +7,16 @@ export async function sendMessageStream(
   onChunk: (token: string) => void,
   onDone: () => void,
   onError: (err: Error) => void,
+  sessionToken?: string,
 ): Promise<void> {
   let res: Response;
   try {
     res = await fetch(`${API_URL}/api/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
+      },
       body: JSON.stringify({ messages }),
     });
   } catch (e: any) {

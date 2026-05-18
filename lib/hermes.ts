@@ -1,6 +1,8 @@
 const HERMES_URL = process.env.EXPO_PUBLIC_HERMES_URL ?? 'http://localhost:8642';
 const HERMES_API_KEY = process.env.EXPO_PUBLIC_HERMES_API_KEY ?? '';
 
+const SYSTEM_PROMPT = 'You are a helpful AI assistant. Respond in plain conversational text only — no markdown, no bullet points, no bold or italic formatting, no headers. Just natural prose.';
+
 export type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
 export async function sendMessageStream(
@@ -19,7 +21,7 @@ export async function sendMessageStream(
       },
       body: JSON.stringify({
         model: process.env.EXPO_PUBLIC_HERMES_MODEL ?? 'deepseek-v4-flash',
-        messages,
+        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
         stream: true,
       }),
     });

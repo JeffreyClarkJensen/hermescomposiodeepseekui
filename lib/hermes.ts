@@ -1,7 +1,4 @@
-const HERMES_URL = process.env.EXPO_PUBLIC_HERMES_URL ?? 'http://localhost:8642';
-const HERMES_API_KEY = process.env.EXPO_PUBLIC_HERMES_API_KEY ?? '';
-
-const SYSTEM_PROMPT = 'You are a helpful AI assistant. Respond in plain conversational text only — no markdown, no bullet points, no bold or italic formatting, no headers. Just natural prose.';
+const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
 
 export type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
@@ -13,17 +10,10 @@ export async function sendMessageStream(
 ): Promise<void> {
   let res: Response;
   try {
-    res = await fetch(`${HERMES_URL}/v1/chat/completions`, {
+    res = await fetch(`${API_URL}/api/chat`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(HERMES_API_KEY ? { Authorization: `Bearer ${HERMES_API_KEY}` } : {}),
-      },
-      body: JSON.stringify({
-        model: process.env.EXPO_PUBLIC_HERMES_MODEL ?? 'deepseek-v4-flash',
-        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
-        stream: true,
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages }),
     });
   } catch (e: any) {
     onError(new Error(`Network error: ${e.message}`));
@@ -32,7 +22,7 @@ export async function sendMessageStream(
 
   if (!res.ok) {
     const body = await res.text().catch(() => '');
-    onError(new Error(`Hermes ${res.status}: ${body}`));
+    onError(new Error(`API ${res.status}: ${body}`));
     return;
   }
 

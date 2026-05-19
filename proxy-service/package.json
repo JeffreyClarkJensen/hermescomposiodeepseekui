@@ -1,0 +1,13 @@
+{
+  "name": "jarvis-composio-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Railway proxy for Composio MCP + Hermes API",
+  "scripts": {
+    "start": "node proxy.js",
+    "dev": "node proxy.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}

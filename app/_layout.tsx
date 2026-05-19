@@ -1,22 +1,36 @@
 import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-const tokenCache = {
-  async getToken(key: string) {
-    return SecureStore.getItemAsync(key);
-  },
-  async saveToken(key: string, value: string) {
-    return SecureStore.setItemAsync(key, value);
-  },
-  async clearToken(key: string) {
-    return SecureStore.deleteItemAsync(key);
-  },
-};
+// Web-safe token cache: use SecureStore on native, localStorage on web
+const tokenCache = Platform.OS === 'web'
+  ? {
+      async getToken(key: string) {
+        try { return localStorage.getItem(key); } catch { return null; }
+      },
+      async saveToken(key: string, value: string) {
+        try { localStorage.setItem(key, value); } catch {}
+      },
+      async clearToken(key: string) {
+        try { localStorage.removeItem(key); } catch {}
+      },
+    }
+  : {
+      async getToken(key: string) {
+        return SecureStore.getItemAsync(key);
+      },
+      async saveToken(key: string, value: string) {
+        return SecureStore.setItemAsync(key, value);
+      },
+      async clearToken(key: string) {
+        return SecureStore.deleteItemAsync(key);
+      },
+    };
 
 function RootLayoutNav() {
   const { isSignedIn, isLoaded } = useAuth();

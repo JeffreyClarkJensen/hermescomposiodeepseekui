@@ -23,7 +23,10 @@ function RootLayoutNav() {
   const segments = useSegments();
   const router = useRouter();
 
+  const skipAuth = process.env.EXPO_PUBLIC_SKIP_AUTH === 'true';
+
   useEffect(() => {
+    if (skipAuth) return;
     if (!isLoaded) return;
     const inAuthGroup = segments[0] === '(auth)';
     if (!isSignedIn && !inAuthGroup) {
@@ -31,7 +34,7 @@ function RootLayoutNav() {
     } else if (isSignedIn && inAuthGroup) {
       router.replace('/');
     }
-  }, [isSignedIn, isLoaded, segments]);
+  }, [isSignedIn, isLoaded, segments, skipAuth]);
 
   return <Stack screenOptions={{ headerShown: false }} />;
 }

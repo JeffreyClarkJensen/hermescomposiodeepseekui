@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schema.railway.app/railway.json",
+  "build": {
+    "builder": "nixpacks",
+    "buildCommand": null,
+    "watchPatterns": ["proxy-service/**"],
+    "nixpacksConfigPath": "proxy-service/"
+  },
+  "deploy": {
+    "startCommand": "node proxy.js",
+    "healthcheckPath": "/health",
+    "restartPolicyType": "always",
+    "restartPolicyMaxRetries": 5
+  }
+}
